@@ -1,0 +1,48 @@
+services:
+  blog:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: blog-app
+    container_name: blog-app-ct
+    ports:
+      - 8080:8080
+    depends_on:
+      - blog-db
+    environment:
+      - DATASOURCE_URL=jdbc:postgresql://blog-db:5432/blog
+      - DATASOURCE_USERNAME=root
+      - DATASOURCE_PASSWORD=root
+      - AWS_REGION=${AWS_REGION}
+      - AWS_SERVICE_ENDPOINT=${AWS_SERVICE_ENDPOINT}
+      - AWS_S3_BUCKET_NAME=${AWS_S3_BUCKET_NAME}
+      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - AWS_SECRET_KEY=${AWS_SECRET_KEY}
+    networks:
+      - blog-network
+
+  blog-db:
+    image: postgres:14-alpine
+    container_name: blog-db-ct
+    volumes:
+      - postgres_home:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=blog
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+    networks:
+      - blog-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U root -d blog" ]
+      interval: 10s
+      timeout: 2s
+      retries: 2
+
+volumes:
+  postgres_home:
+
+networks:
+  blog-network:
+    driver: bridge
