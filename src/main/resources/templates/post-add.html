@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <!--/*@thymesVar id="post" type="ru.yandex.practicum.model.Post"*/-->
+    <title th:text="${post == null ? 'Новый пост' : 'Редактирование поста'}"></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-container {
+            width: 80%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            width: 150px;
+        }
+        textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            resize: vertical;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        textarea[name="title"] {
+            height: 60px;
+        }
+        textarea[name="tags"] {
+            height: 60px;
+        }
+        textarea[name="text"] {
+            height: 300px;
+            min-height: 150px;
+        }
+        .button-group {
+            text-align: right;
+            margin-top: 20px;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #e0e0e0;
+        }
+        .image-upload {
+            margin-top: 10px;
+        }
+        input[type="file"] {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <!--/*@thymesVar id="post" type="ru.yandex.practicum.model.Post"*/-->
+    <h1 th:text="${post == null ? 'Создание нового поста' : 'Редактирование поста'}"></h1>
+
+    <a href="/posts" style="float:right;">
+        <b>На главную &cudarrr;</b>
+    </a>
+
+    <form method="POST" th:action="${post == null ? '/posts' : '/posts/' + post.id}" enctype="multipart/form-data" accept-charset="UTF-8">
+        <table>
+            <tr>
+                <th><label for="title">Название:</label></th>
+                <td>
+                    <textarea id="title" name="title" required th:text="${post?.title}"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="image">Изображение:</label></th>
+                <td>
+                    <input id="image" type="file" name="image" class="image-upload">
+                </td>
+            </tr>
+            <tr>
+                <th><label for="tags">Теги:</label></th>
+                <td>
+                    <textarea id="tags" name="tags" placeholder="Введите теги через пробел" th:text="${post?.tags}"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="text">Текст:</label></th>
+                <td>
+                    <textarea id="text" name="text" required th:text="${post?.text}"></textarea>
+                </td>
+            </tr>
+        </table>
+
+        <div class="button-group">
+            <a th:href="@{/posts}"><button type="button">Отмена</button></a>
+            <button type="submit" th:text="${post == null ? 'Сохранить' : 'Обновить'}"></button>
+        </div>
+    </form>
+</div>
+</body>
+</html>
