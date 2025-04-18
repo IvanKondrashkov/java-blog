@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Лента постов</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .post-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .post-table td {
+            border-bottom: 1px solid #ddd;
+            padding: 20px 0;
+            vertical-align: top;
+        }
+        .post-title {
+            font-size: 1.5em;
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .post-image {
+            max-width: 100%;
+            height: auto;
+            max-height: 300px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .post-preview {
+            color: #666;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+        .post-meta {
+            margin: 10px 0;
+            color: #888;
+        }
+        .post-meta span {
+            margin-right: 15px;
+        }
+        .post-tags {
+            margin-top: 10px;
+        }
+        .post-tags span {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-right: 5px;
+            font-size: 0.8em;
+        }
+        .controls {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .control-group {
+            margin-bottom: 10px;
+        }
+        label {
+            display: inline-block;
+            width: 120px;
+        }
+        select, input[type="text"] {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 8px 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .pagination button {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .current-page {
+            padding: 8px 15px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Лента постов</h1>
+        <a th:href="@{/posts/add}">
+            <button>Добавить пост</button>
+        </a>
+    </div>
+
+    <div class="controls">
+        <form method="GET" th:action="@{/posts}">
+            <div class="control-group">
+                <label for="search">Поиск по тегу:</label>
+                <input type="text" id="search" name="search" th:value="${search}" placeholder="Введите тег...">
+            </div>
+
+            <div class="control-group">
+                <label for="sort">Сортировать по:</label>
+                <select id="sort" name="sort" onchange="this.form.submit()">
+                    <option value="PUBLISH_DT"
+                            th:selected="${sort.name() == 'PUBLISH_DT'}">Дате публикации</option>
+                    <option value="TITLE"
+                            th:selected="${sort.name() == 'TITLE'}">Названию</option>
+                    <option value="LIKES"
+                            th:selected="${sort.name() == 'LIKES'}">Количеству лайков</option>
+                </select>
+
+                <select id="order" name="order" onchange="this.form.submit()">
+                    <option value="DESC"
+                            th:selected="${order.name() == 'DESC'}">По убыванию</option>
+                    <option value="ASC"
+                            th:selected="${order.name() == 'ASC'}">По возрастанию</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="pageSize">Постов на странице:</label>
+                <select id="pageSize" name="pageSize" onchange="this.form.submit()">
+                    <option value="5" th:selected="${paging.pageSize == 5}">5</option>
+                    <option value="10" th:selected="${paging.pageSize == 10}">10</option>
+                    <option value="20" th:selected="${paging.pageSize == 20}">20</option>
+                    <option value="50" th:selected="${paging.pageSize == 50}">50</option>
+                </select>
+            </div>
+
+            <input type="hidden" name="pageNumber" th:value="${paging.pageNumber}">
+        </form>
+    </div>
+
+    <table class="post-table">
+        <!--/*@thymesVar id="post" type="ru.yandex.practicum.dto.PostInfo"*/-->
+        <tr th:each="post : ${posts}">
+            <td style="border-bottom:thin solid #ddd;">
+                <h2 class="post-title" th:text="${post.title}"></h2>
+                <p>
+                    <a th:href="@{'/posts/' + ${post.id}}">
+                        <img class="post-image" height="300" th:src="${post.image.imageUrl}" th:if="${post.image.imageUrl}" alt="Post image">
+                    </a>
+                </p>
+                <p class="post-preview" th:text="${post.getTextPreview()}"></p>
+                <p class="post-meta">
+                    <span th:text="'👍 ' + ${post.likes}"></span>
+                    <span th:text="'💬 ' + ${post.comments.size()}"></span>
+                </p>
+                <p class="post-tags">
+                    <span th:each="tag : ${post.tags}" th:text="${'#' + tag.name + ' '}"></span>
+                </p>
+            </td>
+        </tr>
+    </table>
+
+    <div class="pagination">
+        <button th:if="${paging.hasPrevious}"
+                th:onclick="'location.href=\'' + @{/posts(search=${search}, sort=${sort.name()}, order=${order.name()}, pageSize=${paging.pageSize}, pageNumber=${paging.pageNumber - 1})} + '\''">
+            Назад
+        </button>
+        <span class="current-page" th:text="${paging.pageNumber}"></span>
+        <button th:if="${paging.hasNext}"
+                th:onclick="'location.href=\'' + @{/posts(search=${search}, sort=${sort.name()}, order=${order.name()}, pageSize=${paging.pageSize}, pageNumber=${paging.pageNumber + 1})} + '\''">
+            Вперед
+        </button>
+    </div>
+</div>
+</body>
+</html>
