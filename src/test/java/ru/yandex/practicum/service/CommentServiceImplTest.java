@@ -57,6 +57,9 @@ public class CommentServiceImplTest {
 
         assertNotNull(commentDb);
         assertEquals(commentDb.getText(), comment.getText());
+
+        verify(postRepository, times(1)).findById(post.getId());
+        verify(commentRepository, times(1)).findById(comment.getId());
     }
 
     @Test
@@ -68,6 +71,9 @@ public class CommentServiceImplTest {
 
         assertNotNull(comments);
         assertEquals(comments.size(), 1);
+
+        verify(postRepository, times(1)).findById(post.getId());
+        verify(commentRepository, times(1)).findAll(post.getId());
     }
 
     @Test
@@ -79,6 +85,9 @@ public class CommentServiceImplTest {
 
         assertNotNull(commentDb);
         assertEquals(commentDb.getText(), comment.getText());
+
+        verify(postRepository, times(1)).findById(post.getId());
+        verify(commentRepository, times(1)).save(comment, post.getId());
     }
 
     @Test
@@ -91,6 +100,11 @@ public class CommentServiceImplTest {
 
         assertNotNull(commentDb);
         assertEquals(commentDb.getText(), comment.getText());
+
+
+        verify(postRepository, times(1)).findById(post.getId());
+        verify(commentRepository, times(1)).findById(comment.getId());
+        verify(commentRepository, times(1)).update(comment, post.getId());
     }
 
     @Test
@@ -99,6 +113,8 @@ public class CommentServiceImplTest {
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
 
         assertDoesNotThrow(() -> commentService.deleteById(post.getId(), comment.getId()));
-        verify(commentRepository).deleteById(comment.getId());
+
+        verify(postRepository, times(1)).findById(post.getId());
+        verify(commentRepository, times(1)).deleteById(comment.getId());
     }
 }

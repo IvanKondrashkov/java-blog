@@ -10,12 +10,12 @@ services:
     depends_on:
       - blog-db
     environment:
-      - DATASOURCE_URL=jdbc:postgresql://blog-db:5432/blog
-      - DATASOURCE_USERNAME=root
-      - DATASOURCE_PASSWORD=root
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://blog-db:5432/blog
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
       - AWS_REGION=${AWS_REGION}
       - AWS_SERVICE_ENDPOINT=${AWS_SERVICE_ENDPOINT}
-      - AWS_S3_BUCKET_NAME=${AWS_S3_BUCKET_NAME}
+      - AWS_BUCKET_NAME=${AWS_BUCKET_NAME}
       - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
       - AWS_SECRET_KEY=${AWS_SECRET_KEY}
     networks:
