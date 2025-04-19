@@ -5,34 +5,29 @@ import java.nio.file.Files;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.TestPropertySource;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.amazonaws.services.s3.AmazonS3;
 import ru.yandex.practicum.model.Post;
 import ru.yandex.practicum.model.Image;
-import ru.yandex.practicum.config.TestConfig;
 import static org.junit.jupiter.api.Assertions.*;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@Testcontainers
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TestConfig.class)
-@TestPropertySource("classpath:application-test.properties")
-public class JdbcNativeImageRepositoryIntTest {
+public class JdbcNativeImageRepositoryIntTest extends BaseJdbcNativeRepositoryIntTest {
     @Autowired
     private PostRepository postRepository;
     @Autowired
     private ImageRepository imageRepository;
+    @Autowired
+    private AmazonS3 s3Client;
     private Post post;
 
     @BeforeEach
     void setUp() throws IOException {
         ClassPathResource resource = new ClassPathResource("static/test-image.jpg");
         byte[] bytes = Files.readAllBytes(resource.getFile().toPath());
+
+        s3Client.createBucket("test-bucket");
 
         post = Post.builder()
                 .title("Linux")

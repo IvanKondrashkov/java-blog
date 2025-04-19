@@ -4,48 +4,33 @@ import java.util.Set;
 import java.util.List;
 import java.util.Collections;
 import java.util.stream.Collectors;
-import org.mockito.Mock;
-import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.yandex.practicum.dto.*;
 import ru.yandex.practicum.model.Post;
-import ru.yandex.practicum.config.TestConfig;
 import ru.yandex.practicum.service.PostService;
 import static org.mockito.Mockito.*;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
-@ContextConfiguration(classes = TestConfig.class)
+@WebMvcTest(PostController.class)
 class PostControllerTest {
-    @Mock
-    private PostService postService;
-    @InjectMocks
-    private PostController postController;
+    @Autowired
     private MockMvc mockMvc;
+    @MockitoBean
+    private PostService postService;
     private PostInfo postInfo;
     private ImageInfo imageInfo;
     private Set<TagInfo> tags;
 
     @BeforeEach
     void setUp() {
-        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
-        viewResolver.setPrefix("/templates/");
-        viewResolver.setSuffix(".html");
-
-        mockMvc = MockMvcBuilders.standaloneSetup(postController)
-                .setViewResolvers(viewResolver)
-                .build();
-
         tags = Set.of(
                 TagInfo.builder().id(1L).name("os").postId(1L).build(),
                 TagInfo.builder().id(2L).name("it").postId(1L).build(),
@@ -59,14 +44,14 @@ class PostControllerTest {
         postInfo = PostInfo.builder()
                 .id(1L)
                 .textByParagraph(List.of("The best post!"))
-                .tags(tags)
                 .image(imageInfo)
+                .tags(tags)
+                .comments(Set.of())
                 .build();
     }
 
     @AfterEach
     void tearDown() {
-        mockMvc = null;
         tags = null;
         imageInfo = null;
         postInfo = null;
@@ -98,6 +83,8 @@ class PostControllerTest {
                 .andExpect(view().name("post-add"))
                 .andExpect(model().attributeExists("post"))
                 .andExpect(model().attributeExists("imageUrl"));
+
+        verify(postService, times(1)).findById(1L);
     }
 
     @Test
@@ -109,6 +96,8 @@ class PostControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("post-view"))
                 .andExpect(model().attributeExists("post"));
+
+        verify(postService, times(1)).findById(1L);
     }
 
     @Test
@@ -122,6 +111,9 @@ class PostControllerTest {
                 .andExpect(view().name("posts"))
                 .andExpect(model().attributeExists("posts"))
                 .andExpect(model().attributeExists("paging"));
+
+        verify(postService, times(1)).findAll(any(), any(), any());
+        verify(postService, times(1)).count();
     }
 
     @Test
@@ -137,6 +129,9 @@ class PostControllerTest {
                 .andExpect(model().attributeExists("posts"))
                 .andExpect(model().attributeExists("paging"))
                 .andExpect(model().attributeExists("search"));
+
+        verify(postService, times(1)).findAllByTag(any(), any(), any(), anyString());
+        verify(postService, times(1)).countByTag(anyString());
     }
 
     @Test
@@ -151,6 +146,8 @@ class PostControllerTest {
                         .param("tags", tags.stream().map(TagInfo::getName).collect(Collectors.joining(" "))))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/posts/1"));
+
+        verify(postService, times(1)).save(any(Post.class));
     }
 
     @Test
@@ -162,6 +159,8 @@ class PostControllerTest {
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/posts/1"));
+
+        verify(postService, times(1)).update(any(Post.class), any());
     }
 
     @Test
