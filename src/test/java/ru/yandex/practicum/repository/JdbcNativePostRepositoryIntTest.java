@@ -4,22 +4,14 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.yandex.practicum.dto.Page;
 import ru.yandex.practicum.dto.Sort;
 import ru.yandex.practicum.dto.Order;
 import ru.yandex.practicum.model.Post;
-import ru.yandex.practicum.config.TestConfig;
 import static org.junit.jupiter.api.Assertions.*;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@Testcontainers
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TestConfig.class)
-public class JdbcNativePostRepositoryIntTest {
+public class JdbcNativePostRepositoryIntTest extends BaseJdbcNativeRepositoryIntTest {
     @Autowired
     private PostRepository postRepository;
     private Post post;
