@@ -2,41 +2,27 @@ package ru.yandex.practicum.config;
 
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.jdbc.core.JdbcTemplate;
-import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import ru.yandex.practicum.config.properties.DataSourceProperties;
 
-@Configuration
-@PropertySource("classpath:application.properties")
+@AutoConfiguration
+@EnableConfigurationProperties(DataSourceProperties.class)
 public class DataSourceConfig {
     @Bean
-    public DataSource dataSource(
-            @Value("${datasource.url}") String url,
-            @Value("${datasource.username}") String username,
-            @Value("${datasource.password}") String password,
-            @Value("${datasource.driver-class-name}") String driverClassName
-    ) {
+    public DataSource dataSource(DataSourceProperties dataSourceProperties) {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setUrl(url);
-        dataSource.setUsername(username);
-        dataSource.setPassword(password);
-        dataSource.setDriverClassName(driverClassName);
+        dataSource.setUrl(dataSourceProperties.getUrl());
+        dataSource.setUsername(dataSourceProperties.getUsername());
+        dataSource.setPassword(dataSourceProperties.getPassword());
+        dataSource.setDriverClassName(dataSourceProperties.getDriverClassName());
         return dataSource;
     }
 
     @Bean
     public JdbcTemplate jdbcTemplate(DataSource dataSource) {
         return new JdbcTemplate(dataSource);
-    }
-
-    @Bean
-    public SpringLiquibase liquibase(DataSource dataSource) {
-        SpringLiquibase liquibase = new SpringLiquibase();
-        liquibase.setChangeLog("classpath:db/liquibase-changelog.xml");
-        liquibase.setDataSource(dataSource);
-        return liquibase;
     }
 }

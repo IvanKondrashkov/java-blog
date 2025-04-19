@@ -1,38 +1,31 @@
 package ru.yandex.practicum.controller;
 
-import org.mockito.Mock;
-import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.yandex.practicum.config.TestConfig;
 import ru.yandex.practicum.model.Comment;
 import ru.yandex.practicum.dto.CommentInfo;
 import ru.yandex.practicum.service.CommentService;
-import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-@ExtendWith(MockitoExtension.class)
-@ContextConfiguration(classes = TestConfig.class)
+@WebMvcTest(CommentController.class)
 class CommentControllerTest {
-    @Mock
-    private CommentService commentService;
-    @InjectMocks
-    private CommentController commentController;
+    @Autowired
     private MockMvc mockMvc;
+    @MockitoBean
+    private CommentService commentService;
     private CommentInfo commentInfo;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(commentController).build();
         commentInfo = CommentInfo.builder()
                 .id(1L)
                 .text("Coll post!")
@@ -42,7 +35,6 @@ class CommentControllerTest {
 
     @AfterEach
     void tearDown() {
-        mockMvc = null;
         commentInfo = null;
     }
 
@@ -55,6 +47,8 @@ class CommentControllerTest {
                         .param("text", commentInfo.getText()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/posts/1"));
+
+        verify(commentService, times(1)).save(any(Comment.class), anyLong());
     }
 
     @Test
@@ -67,6 +61,8 @@ class CommentControllerTest {
                         .param("text", commentInfo.getText()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/posts/1"));
+
+        verify(commentService, times(1)).update(any(Comment.class), anyLong(), anyLong());
     }
 
     @Test

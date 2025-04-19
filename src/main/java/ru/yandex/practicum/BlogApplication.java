@@ -1,29 +1,15 @@
 package ru.yandex.practicum;
 
-import jakarta.servlet.ServletRegistration;
-import ru.yandex.practicum.config.WebConfig;
-import jakarta.servlet.MultipartConfigElement;
-import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+import io.github.cdimascio.dotenv.Dotenv;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-public class BlogApplication extends AbstractAnnotationConfigDispatcherServletInitializer {
+@SpringBootApplication
+public class BlogApplication {
+    public static void main(String[] args) {
+        Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
+        dotenv.entries().forEach(e -> System.setProperty(e.getKey(), e.getValue()));
 
-    @Override
-    protected Class<?>[] getRootConfigClasses() {
-        return new Class[0];
-    }
-
-    @Override
-    protected Class<?>[] getServletConfigClasses() {
-        return new Class[]{WebConfig.class};
-    }
-
-    @Override
-    protected String[] getServletMappings() {
-        return new String[]{"/"};
-    }
-
-    @Override
-    protected void customizeRegistration(ServletRegistration.Dynamic registration) {
-        registration.setMultipartConfig(new MultipartConfigElement("", 5242880, 5242880, 0));
+        SpringApplication.run(BlogApplication.class, args);
     }
 }

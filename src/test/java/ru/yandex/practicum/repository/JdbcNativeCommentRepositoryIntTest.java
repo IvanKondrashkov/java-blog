@@ -5,20 +5,13 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 import ru.yandex.practicum.model.Post;
 import ru.yandex.practicum.model.Comment;
-import ru.yandex.practicum.config.TestConfig;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Testcontainers
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TestConfig.class)
-public class JdbcNativeCommentRepositoryIntTest {
+
+public class JdbcNativeCommentRepositoryIntTest extends BaseJdbcNativeRepositoryIntTest {
     @Autowired
     private PostRepository postRepository;
     @Autowired

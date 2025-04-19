@@ -1,13 +1,15 @@
 package ru.yandex.practicum.service;
 
+import java.io.ByteArrayInputStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.amazonaws.services.s3.AmazonS3;
-import ru.yandex.practicum.config.AwsProperties;
+import ru.yandex.practicum.config.properties.AwsProperties;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import org.springframework.web.multipart.MultipartFile;
 import ru.yandex.practicum.exception.S3ConnectionException;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Service
 @RequiredArgsConstructor
@@ -17,7 +19,10 @@ public class S3ServiceImpl implements S3Service {
 
     @Override
     public String uploadImage(String fileName, MultipartFile image) {
-        try (var is = image.getInputStream()) {
+        try {
+            byte[] bytes = image.getBytes();
+            InputStream is = new ByteArrayInputStream(bytes);
+
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(image.getSize());
             metadata.setContentType(image.getContentType());
