@@ -3,7 +3,7 @@ package ru.yandex.practicum.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.amazonaws.services.s3.AmazonS3;
-import ru.yandex.practicum.config.AwsProperties;
+import ru.yandex.practicum.config.properties.AwsProperties;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import org.springframework.web.multipart.MultipartFile;
 import ru.yandex.practicum.exception.S3ConnectionException;
